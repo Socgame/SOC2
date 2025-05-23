@@ -1,0 +1,507 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2487.5">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
+    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Hiragino Mincho ProN'; -webkit-text-stroke: #000000}
+    span.s1 {font-kerning: none}
+    span.s2 {font: 12.0px 'Hiragino Mincho ProN'; font-kerning: none}
+    span.s3 {font: 12.0px Times; font-kerning: none}
+    span.s4 {font: 12.0px Menlo; font-kerning: none}
+    span.s5 {font: 12.0px 'Apple Color Emoji'; font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="ja"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;title&gt;</span><span class="s2">チンチロゲーム</span><span class="s1">&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- Visualization &amp; Content Choices:</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>- Report Info: Dice rolls and game state.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>- Goal: Provide real-time visual feedback and clear game progression.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>- Viz/Presentation Method:</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>- 3D Dice (Three.js + Cannon.js): For realistic dice rolling animation.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>- HTML text/emojis: For displaying actual numerical results, player roles, and game messages.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>- Dynamic lists: For roll history.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>- Interaction:</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>- "</span><span class="s2">サイコロを振る</span><span class="s1">" button: Triggers 3D dice roll and game logic.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>- "</span><span class="s2">新しいゲーム</span><span class="s1">" button: Resets game state and roles.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>- Justification: 3D dice provide a "wow" factor and enhance engagement. Clear text ensures understanding of game rules and outcomes.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>- Library/Method: Three.js, Cannon.js, Vanilla JS, Tailwind CSS.</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>--&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;style&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>body {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.bg-warm-neutral-bg { background-color: #f5f5f4; } /* stone-100 */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.text-warm-neutral-heading { color: #3f3f46; } /* stone-700 */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.text-warm-neutral-body { color: #57534e; } /* stone-600 */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.accent-color { background-color: #0d9488; color: white; } /* teal-600 */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.accent-color-hover:hover { background-color: #0f766e; } /* teal-700 */</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>canvas {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>display: block;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 100%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>height: 100%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-radius: 0.5rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.game-canvas-container {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>position: relative;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 100%;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>max-width: 600px; /* Max width for the 3D canvas */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>height: 400px; /* Fixed height for the 3D canvas */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-left: auto;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-right: auto;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-radius: 0.5rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>overflow: hidden; /* Ensure dice don't visually escape */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-color: #d6d3d1; /* stone-300 for ground */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>box-shadow: inset 0 0 10px rgba(0,0,0,0.2);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.roll-result-dice {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 2.5rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>line-height: 1;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin: 0 0.25rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.roll-history-item {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 0.75rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-color: #fefefe;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-radius: 0.375rem;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>box-shadow: 0 1px 3px rgba(0,0,0,0.05);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body class="bg-warm-neutral-bg text-warm-neutral-body min-h-screen flex flex-col items-center p-4 md:p-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="w-full max-w-4xl bg-white rounded-lg shadow-xl p-6 md:p-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;h1 class="text-4xl font-bold text-center text-warm-neutral-heading mb-6"&gt;</span><span class="s2">チンチロゲーム</span><span class="s1">&lt;/h1&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0 md:space-x-4"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div id="player-role" class="text-xl font-semibold text-center md:text-left text-warm-neutral-heading w-full md:w-1/2"&gt;</span></p>
+<p class="p3"><span class="s3"><span class="Apple-converted-space">                </span></span><span class="s1">ゲーム開始！</span><span class="s3"> </span><span class="s1">「新しいゲーム」をクリックして役割を決めましょう。</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="flex space-x-4 w-full md:w-1/2 justify-center md:justify-end"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button id="new-game-btn" class="px-6 py-3 rounded-lg font-bold shadow-md transition duration-200 ease-in-out bg-gray-300 text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s2">新しいゲーム</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button id="roll-dice-btn" class="px-8 py-3 rounded-lg font-bold shadow-md transition duration-200 ease-in-out accent-color accent-color-hover focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-50" disabled&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s2">サイコロを振る</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="mb-6 flex flex-col items-center"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="game-canvas-container mb-4"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;canvas id="gameCanvas"&gt;&lt;/canvas&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div id="current-roll-display" class="text-center text-2xl font-bold text-warm-neutral-heading"&gt;</span></p>
+<p class="p3"><span class="s3"><span class="Apple-converted-space">                </span></span><span class="s1">ここにサイコロの結果が表示されます</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="bg-gray-50 p-4 rounded-lg shadow-inner"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h2 class="text-xl font-semibold text-warm-neutral-heading mb-3"&gt;</span><span class="s2">ゲーム進行</span><span class="s1">&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div id="game-status" class="text-lg mb-4 text-warm-neutral-body"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div id="roll-history" class="space-y-3 max-h-60 overflow-y-auto pr-2"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Game State Variables</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let isParentUser = null; // true: user is parent, false: user is child</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let userRollCount = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let botRollCount = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let userFinalYaku = null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let botFinalYaku = null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let gameActive = false; // To prevent rolling before game start or after game end</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// DOM Elements</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const playerRoleDisplay = document.getElementById('player-role');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const rollDiceBtn = document.getElementById('roll-dice-btn');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const newGameBtn = document.getElementById('new-game-btn');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const currentRollDisplay = document.getElementById('current-roll-display');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const gameStatusDisplay = document.getElementById('game-status');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const rollHistoryDisplay = document.getElementById('roll-history');</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Dice Emojis (for text display)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const DICE_EMOJIS = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>1: "</span><span class="s4">⚀</span><span class="s1">", 2: "</span><span class="s4">⚁</span><span class="s1">", 3: "</span><span class="s4">⚂</span><span class="s1">", 4: "</span><span class="s4">⚃</span><span class="s1">", 5: "</span><span class="s4">⚄</span><span class="s1">", 6: "</span><span class="s4">⚅</span><span class="s1">",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// --- Game Logic Functions (Translated from Python) ---</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function rollDiceLogic() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>Math.floor(Math.random() * 6) + 1,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>Math.floor(Math.random() * 6) + 1,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>Math.floor(Math.random() * 6) + 1</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>].sort((a, b) =&gt; a - b);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function getChinchiroYaku(diceValues) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const [d1, d2, d3] = diceValues;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// </span><span class="s2">シゴロ</span><span class="s1"> (4-5-6)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (new Set(diceValues).size === 3 &amp;&amp; diceValues.includes(4) &amp;&amp; diceValues.includes(5) &amp;&amp; diceValues.includes(6)) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>return ["</span><span class="s2">シゴロ</span><span class="s1"> (4-5-6)", 100];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// </span><span class="s2">ヒフミ</span><span class="s1"> (1-2-3)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (new Set(diceValues).size === 3 &amp;&amp; diceValues.includes(1) &amp;&amp; diceValues.includes(2) &amp;&amp; diceValues.includes(3)) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>return ["</span><span class="s2">ヒフミ</span><span class="s1"> (1-2-3)", -1];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// </span><span class="s2">アラシ</span><span class="s1"> (</span><span class="s2">ゾロ目</span><span class="s1">)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (d1 === d2 &amp;&amp; d2 === d3) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>return [`</span><span class="s2">アラシ</span><span class="s1"> (${d1}-${d1}-${d1})`, 90 + d1];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// </span><span class="s2">目</span><span class="s1"> (2</span><span class="s2">つ同じ、</span><span class="s1">1</span><span class="s2">つ異なる</span><span class="s1">)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (d1 === d2) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>return [`${d3}</span><span class="s2">の目</span><span class="s1">`, 10 + d3];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else if (d1 === d3) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>return [`${d2}</span><span class="s2">の目</span><span class="s1">`, 10 + d2];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else if (d2 === d3) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>return [`${d1}</span><span class="s2">の目</span><span class="s1">`, 10 + d1];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// </span><span class="s2">目無し</span><span class="s1"> (</span><span class="s2">ドボン</span><span class="s1">)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return ["</span><span class="s2">目無し</span><span class="s1"> (</span><span class="s2">ドボン</span><span class="s1">)", 0];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// --- Three.js and Cannon.js Setup ---</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let scene, camera, renderer, world;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const diceMeshes = [];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const diceBodies = [];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const DICE_SIZE = 1.5; // Size of the dice in 3D units</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function init3D() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Scene</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene = new THREE.Scene();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.background = new THREE.Color(0xd6d3d1); // Match container background</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Camera</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>camera.position.set(0, 5, 5); // Position camera above and slightly in front</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>camera.lookAt(0, 0, 0); // Look at the center of the scene</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Renderer</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const canvas = document.getElementById('gameCanvas');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>renderer.setSize(canvas.clientWidth, canvas.clientHeight);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>renderer.setPixelRatio(window.devicePixelRatio); // For better quality on high-DPI screens</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Lighting</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.add(ambientLight);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>directionalLight.position.set(5, 10, 7);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>scene.add(directionalLight);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Cannon.js World</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>world = new CANNON.World();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>world.gravity.set(0, -9.82, 0); // m/s²</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>world.broadphase = new CANNON.NaiveBroadphase();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>world.solver.iterations = 10;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Ground Plane</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const groundShape = new CANNON.Plane();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const groundBody = new CANNON.Body({ mass: 0, shape: groundShape });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2); // Rotate to be horizontal</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>world.addBody(groundBody);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Walls (optional, to keep dice contained)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const wallThickness = 0.1;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const wallHeight = 5;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const tableSize = 4; // Half size of the table</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const wallMaterial = new CANNON.Material();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Front Wall</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const frontWallShape = new CANNON.Box(new CANNON.Vec3(tableSize, wallHeight / 2, wallThickness / 2));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const frontWallBody = new CANNON.Body({ mass: 0, shape: frontWallShape, material: wallMaterial });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>frontWallBody.position.set(0, wallHeight / 2, -tableSize - wallThickness / 2);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>world.addBody(frontWallBody);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Back Wall</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const backWallShape = new CANNON.Box(new CANNON.Vec3(tableSize, wallHeight / 2, wallThickness / 2));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const backWallBody = new CANNON.Body({ mass: 0, shape: backWallShape, material: wallMaterial });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>backWallBody.position.set(0, wallHeight / 2, tableSize + wallThickness / 2);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>world.addBody(backWallBody);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Left Wall</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const leftWallShape = new CANNON.Box(new CANNON.Vec3(wallThickness / 2, wallHeight / 2, tableSize));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const leftWallBody = new CANNON.Body({ mass: 0, shape: leftWallShape, material: wallMaterial });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>leftWallBody.position.set(-tableSize - wallThickness / 2, wallHeight / 2, 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>world.addBody(leftWallBody);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Right Wall</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const rightWallShape = new CANNON.Box(new CANNON.Vec3(wallThickness / 2, wallHeight / 2, tableSize));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const rightWallBody = new CANNON.Body({ mass: 0, shape: rightWallShape, material: wallMaterial });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>rightWallBody.position.set(tableSize + wallThickness / 2, wallHeight / 2, 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>world.addBody(rightWallBody);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Create Dice</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const diceGeometry = new THREE.BoxGeometry(DICE_SIZE, DICE_SIZE, DICE_SIZE);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const diceMaterial = new THREE.MeshStandardMaterial({ color: 0xcccccc }); // Light gray dice</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; 3; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const mesh = new THREE.Mesh(diceGeometry, diceMaterial);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>scene.add(mesh);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>diceMeshes.push(mesh);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const shape = new CANNON.Box(new CANNON.Vec3(DICE_SIZE / 2, DICE_SIZE / 2, DICE_SIZE / 2));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const body = new CANNON.Body({ mass: 1, shape: shape });</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>body.position.set(0, 10 + i * 2, 0); // Start dice above the ground</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>world.addBody(body);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>diceBodies.push(body);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Adjust camera for responsiveness</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>window.addEventListener('resize', onWindowResize, false);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>onWindowResize(); // Call once to set initial size</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function onWindowResize() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const canvas = document.getElementById('gameCanvas');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const container = canvas.parentElement;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>renderer.setSize(container.clientWidth, container.clientHeight);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>camera.aspect = container.clientWidth / container.clientHeight;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>camera.updateProjectionMatrix();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let lastTime = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function animate(time) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>requestAnimationFrame(animate);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (!lastTime) lastTime = time;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const dt = (time - lastTime) / 1000; // Delta time in seconds</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>world.step(1 / 60, dt, 10); // Update physics world</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Sync Three.js meshes with Cannon.js bodies</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; diceMeshes.length; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>diceMeshes[i].position.copy(diceBodies[i].position);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>diceMeshes[i].quaternion.copy(diceBodies[i].quaternion);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>renderer.render(scene, camera);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>lastTime = time;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// --- Game State Management and UI Updates ---</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function resetGame() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>isParentUser = null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>userRollCount = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>botRollCount = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>userFinalYaku = null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>botFinalYaku = null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gameActive = false;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>playerRoleDisplay.innerHTML = `</span><span class="s2">ゲーム開始！</span><span class="s1"> </span><span class="s2">「新しいゲーム」をクリックして役割を決めましょう。</span><span class="s1">`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>currentRollDisplay.innerHTML = `</span><span class="s2">ここにサイコロの結果が表示されます</span><span class="s1">`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gameStatusDisplay.innerHTML = ``;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>rollHistoryDisplay.innerHTML = ``;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>rollDiceBtn.disabled = true;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Reset dice positions in 3D scene</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; diceBodies.length; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>diceBodies[i].position.set(0, 10 + i * 2, 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>diceBodies[i].velocity.set(0, 0, 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>diceBodies[i].angularVelocity.set(0, 0, 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>diceBodies[i].quaternion.set(0, 0, 0, 1);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function appendRollHistory(message) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const div = document.createElement('div');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>div.className = 'roll-history-item';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>div.innerHTML = message;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>rollHistoryDisplay.appendChild(div);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>rollHistoryDisplay.scrollTop = rollHistoryDisplay.scrollHeight; // Scroll to bottom</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>async function handleGameTurn(playerName, playerEmoji, isUserPlayer) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let currentYakuResult = null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let rollCount = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const turnMessages = [];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; 3; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>rollCount++;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const diceValues = rollDiceLogic(); // Get actual game logic dice values</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const [yakuName, yakuStrength] = getChinchiroYaku(diceValues);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const diceEmojisStr = diceValues.map(d =&gt; `&lt;span class="roll-result-dice"&gt;${DICE_EMOJIS[d]}&lt;/span&gt;`).join('');</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Display current roll visually (text)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>currentRollDisplay.innerHTML = `${playerEmoji} ${playerName}</span><span class="s2">のサイコロ</span><span class="s1"> (${rollCount}</span><span class="s2">回目</span><span class="s1">): ${diceEmojisStr} </span><span class="s2">役</span><span class="s1">: **${yakuName}**`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>appendRollHistory(`${playerEmoji} ${playerName}</span><span class="s2">のサイコロ</span><span class="s1"> (${rollCount}</span><span class="s2">回目</span><span class="s1">): ${diceEmojisStr} </span><span class="s2">役</span><span class="s1">: **${yakuName}**`);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Simulate dice roll animation</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>await animateDiceRoll(); // Wait for 3D dice animation to complete</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (yakuName === "</span><span class="s2">目無し</span><span class="s1"> (</span><span class="s2">ドボン</span><span class="s1">)" &amp;&amp; rollCount &lt; 3) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>appendRollHistory(`</span><span class="s2">目無しです。もう一度振ります。</span><span class="s1">`);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>currentYakuResult = [yakuName, yakuStrength];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>break;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (currentYakuResult === null || (currentYakuResult[0] === "</span><span class="s2">目無し</span><span class="s1"> (</span><span class="s2">ドボン</span><span class="s1">)" &amp;&amp; rollCount === 3)) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>currentYakuResult = ["</span><span class="s2">目無し</span><span class="s1"> (</span><span class="s2">ドボン</span><span class="s1">)", 0];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>appendRollHistory(`${playerEmoji} ${playerName}</span><span class="s2">は</span><span class="s1">3</span><span class="s2">回とも目無しでした。</span><span class="s1">`);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (isUserPlayer) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>userFinalYaku = currentYakuResult;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>botFinalYaku = currentYakuResult;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return currentYakuResult;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>async function animateDiceRoll() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Apply random forces to dice bodies</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; diceBodies.length; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const body = diceBodies[i];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Reset position to above table for new roll</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>body.position.set(</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>(Math.random() - 0.5) * 2, // Slightly random X</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>5 + Math.random() * 2,<span class="Apple-converted-space">    </span>// Higher Y</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>(Math.random() - 0.5) * 2 // Slightly random Z</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>body.velocity.set(0, 0, 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>body.angularVelocity.set(0, 0, 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>body.quaternion.set(0, 0, 0, 1); // Reset rotation</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Apply random impulse</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const impulseStrength = 5 + Math.random() * 5;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const impulseDirection = new CANNON.Vec3(</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>(Math.random() - 0.5) * 2,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>1 + Math.random(),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>(Math.random() - 0.5) * 2</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>).unit();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>body.applyImpulse(impulseDirection.scale(impulseStrength), body.position);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Apply random angular velocity for spinning</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const angularImpulseStrength = 0.5 + Math.random() * 0.5;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>body.angularVelocity.set(</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>(Math.random() - 0.5) * angularImpulseStrength,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>(Math.random() - 0.5) * angularImpulseStrength,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>(Math.random() - 0.5) * angularImpulseStrength</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Wait for a short duration for the dice to "roll" and settle</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>await new Promise(resolve =&gt; setTimeout(resolve, 2000)); // Adjust duration as needed</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>async function startGame() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>resetGame();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gameActive = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>rollDiceBtn.disabled = false;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Determine user role</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (Math.random() &lt; 0.25) { // 25% chance for user to be parent</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>isParentUser = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>playerRoleDisplay.innerHTML = `</span><span class="s2">あなたは</span><span class="s1">**</span><span class="s2">親</span><span class="s1">**</span><span class="s2">になりました</span><span class="s5">👑</span><span class="s1">`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else { // 75% chance for user to be child</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>isParentUser = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>playerRoleDisplay.innerHTML = `</span><span class="s2">あなたは</span><span class="s1">**</span><span class="s2">子</span><span class="s1">**</span><span class="s2">になりました</span><span class="s5">👶</span><span class="s1">`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>appendRollHistory(playerRoleDisplay.innerHTML);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gameStatusDisplay.innerHTML = `</span><span class="s2">サイコロを振ってゲームを開始しましょう！</span><span class="s1">`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>async function handleRollButtonClick() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (!gameActive) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>gameStatusDisplay.innerHTML = `</span><span class="s2">ゲームを開始するには「新しいゲーム」をクリックしてください。</span><span class="s1">`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>rollDiceBtn.disabled = true; // Disable button during roll</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gameStatusDisplay.innerHTML = `</span><span class="s2">サイコロを振っています</span><span class="s1">...`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>currentRollDisplay.innerHTML = ``; // Clear previous roll display</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Clear history for new round</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>rollHistoryDisplay.innerHTML = '';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>userRollCount = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>botRollCount = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>userFinalYaku = null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>botFinalYaku = null;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Rule 5: Child plays first</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (!isParentUser) { // User is child</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>appendRollHistory(`\n</span><span class="s5">👶</span><span class="s1"> **</span><span class="s2">子（あなた）のターン</span><span class="s1">**`);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>await handleGameTurn("</span><span class="s2">あなた</span><span class="s1"> (</span><span class="s2">子</span><span class="s1">)", "</span><span class="s5">👶</span><span class="s1">", true);</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>appendRollHistory(`\n</span><span class="s5">👑</span><span class="s1"> **</span><span class="s2">親（相手）のターン</span><span class="s1">**`);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>await handleGameTurn("</span><span class="s2">親</span><span class="s1"> (</span><span class="s2">ボット</span><span class="s1">)", "</span><span class="s5">👑</span><span class="s1">", false);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else { // User is parent</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>appendRollHistory(`\n</span><span class="s5">👶</span><span class="s1"> **</span><span class="s2">子（相手）のターン</span><span class="s1">**`);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>await handleGameTurn("</span><span class="s2">子</span><span class="s1"> (</span><span class="s2">ボット</span><span class="s1">)", "</span><span class="s5">👶</span><span class="s1">", false);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>appendRollHistory(`\n</span><span class="s5">👑</span><span class="s1"> **</span><span class="s2">親（あなた）のターン</span><span class="s1">**`);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>await handleGameTurn("</span><span class="s2">あなた</span><span class="s1"> (</span><span class="s2">親</span><span class="s1">)", "</span><span class="s5">👑</span><span class="s1">", true);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// --- Determine Winner ---</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let finalResultText = "";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const [userYakuName, userYakuStrength] = userFinalYaku;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const [botYakuName, botYakuStrength] = botFinalYaku;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const userLostByMenashi = (userYakuName === "</span><span class="s2">目無し</span><span class="s1"> (</span><span class="s2">ドボン</span><span class="s1">)" &amp;&amp; userYakuStrength === 0);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const botLostByMenashi = (botYakuName === "</span><span class="s2">目無し</span><span class="s1"> (</span><span class="s2">ドボン</span><span class="s1">)" &amp;&amp; botYakuStrength === 0);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (userLostByMenashi &amp;&amp; botLostByMenashi) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Rule 4: If both are Menashi, Parent wins</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>finalResultText = `</span><span class="s2">親</span><span class="s1"> (${isParentUser ? '</span><span class="s5">👑</span><span class="s1">' : '</span><span class="s5">👑</span><span class="s1">'}) </span><span class="s2">と子</span><span class="s1"> (${isParentUser ? '</span><span class="s5">👶</span><span class="s1">' : '</span><span class="s5">👶</span><span class="s1">'}) </span><span class="s2">共に</span><span class="s1">3</span><span class="s2">回とも目無しでした。</span><span class="s1">\n**</span><span class="s2">親の勝ちです！</span><span class="s1">**`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else if (userLostByMenashi) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>finalResultText = `</span><span class="s2">残念、</span><span class="s1">${isParentUser ? '</span><span class="s5">👑</span><span class="s1">' : '</span><span class="s5">👶</span><span class="s1">'} </span><span class="s2">あなたは</span><span class="s1">3</span><span class="s2">回とも目無しでした。</span><span class="s1">\n${isParentUser ? '</span><span class="s5">👶</span><span class="s1">' : '</span><span class="s5">👑</span><span class="s1">'} **</span><span class="s2">相手の勝ちです！</span><span class="s1">**`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else if (botLostByMenashi) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>finalResultText = `</span><span class="s5">🎉</span><span class="s1"> ${isParentUser ? '</span><span class="s5">👶</span><span class="s1">' : '</span><span class="s5">👑</span><span class="s1">'} </span><span class="s2">相手は</span><span class="s1">3</span><span class="s2">回とも目無しでした。</span><span class="s1">\n${isParentUser ? '</span><span class="s5">👑</span><span class="s1">' : '</span><span class="s5">👶</span><span class="s1">'} **</span><span class="s2">あなたの勝ちです！</span><span class="s1">**`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else { // Both have valid yaku</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (userYakuStrength &gt; botYakuStrength) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>finalResultText = `</span><span class="s5">🎉</span><span class="s1"> ${isParentUser ? '</span><span class="s5">👑</span><span class="s1">' : '</span><span class="s5">👶</span><span class="s1">'} **</span><span class="s2">あなたの勝ちです！</span><span class="s1">**`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>} else if (userYakuStrength &lt; botYakuStrength) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>finalResultText = `</span><span class="s2">残念、</span><span class="s1">${isParentUser ? '</span><span class="s5">👶</span><span class="s1">' : '</span><span class="s5">👑</span><span class="s1">'} **</span><span class="s2">相手の勝ちです。</span><span class="s1">**`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>} else { // Tie (userYakuStrength == botYakuStrength)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>// Rule 1: If yaku are same, Parent wins</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (isParentUser) { // User is parent, so user wins tie</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>finalResultText = `</span><span class="s2">引き分けですが、</span><span class="s1">${isParentUser ? '</span><span class="s5">👑</span><span class="s1">' : '</span><span class="s5">👑</span><span class="s1">'} **</span><span class="s2">親</span><span class="s1"> (</span><span class="s2">あなた</span><span class="s1">) </span><span class="s2">の勝ちです！</span><span class="s1">**`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>} else { // User is child, so bot (parent) wins tie</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>finalResultText = `</span><span class="s2">引き分けですが、</span><span class="s1">${isParentUser ? '</span><span class="s5">👶</span><span class="s1">' : '</span><span class="s5">👑</span><span class="s1">'} **</span><span class="s2">親</span><span class="s1"> (</span><span class="s2">相手</span><span class="s1">) </span><span class="s2">の勝ちです。</span><span class="s1">**`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gameStatusDisplay.innerHTML = finalResultText;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>appendRollHistory(`\n**</span><span class="s2">最終結果</span><span class="s1">:** ${finalResultText}`);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>rollDiceBtn.disabled = false; // Re-enable for next round (if desired)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// --- Event Listeners ---</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>newGameBtn.addEventListener('click', startGame);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>rollDiceBtn.addEventListener('click', handleRollButtonClick);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Initialize 3D scene and start animation loop</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>init3D();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>animate(); // Start the animation loop immediately</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Initial game setup</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>resetGame(); // Reset game state on load</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>gameStatusDisplay.innerHTML = `</span><span class="s2">「新しいゲーム」をクリックして開始してください。</span><span class="s1">`;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+</body>
+</html>
